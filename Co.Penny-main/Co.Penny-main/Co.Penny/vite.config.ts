@@ -10,7 +10,9 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
-   preview: {
+  preview: {
     allowedHosts: true,
+    port: Number(process.env.PORT) || 4173,
+    host: true,
   },
 })

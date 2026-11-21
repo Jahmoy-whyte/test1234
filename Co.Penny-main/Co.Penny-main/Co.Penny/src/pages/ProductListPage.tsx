@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
+
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+
 import pc1 from "../assets/images/pc1.png";
 import pc2 from "../assets/images/pc2.png";
 import pc3 from "../assets/images/pc3.png";
@@ -17,6 +20,38 @@ interface Product {
   image: string;
   stock: number;
 }
+
+// Animation variants
+
+const fadeUp = {
+  hidden: {
+    opacity: 0,
+    y: 50,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: "easeOut" as const,
+    },
+  },
+};
+
+const zoomIn = {
+  hidden: {
+    opacity: 0,
+    scale: 0.9,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut" as const,
+    },
+  },
+};
 
 const products: Product[] = [
   {
@@ -115,17 +150,27 @@ const products: Product[] = [
   },
 ];
 
+// Product Card
+
 function ProductCard({ product }: { product: Product }) {
   const isOutOfStock = product.stock === 0;
 
   return (
-    <div className="rounded-2xl bg-white p-4">
-      <div className="relative mb-4 flex h-48 items-center justify-center rounded-xl bg-neutral-100">
-        <img
+    <motion.div
+      variants={fadeUp}
+      className="rounded-2xl bg-white p-4 transition-shadow duration-300 hover:shadow-xl"
+    >
+      {/* Product Image */}
+
+      <div className="relative mb-4 flex h-48 items-center justify-center overflow-hidden rounded-xl bg-neutral-100">
+        <motion.img
           src={product.image}
           alt={product.name}
+          whileHover={{ scale: 1.08 }}
+          transition={{ duration: 0.4 }}
           className="h-full w-full object-contain p-4"
         />
+
         {isOutOfStock ? (
           <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
             <span className="text-base font-medium text-white">
@@ -140,31 +185,43 @@ function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
+      {/* Product Details */}
+
       <h3 className="mb-1 text-base font-semibold text-neutral-900">
         {product.name}
       </h3>
-      <p className="mb-3 text-sm text-neutral-500 line-clamp-2">
+
+      <p className="mb-3 line-clamp-2 text-sm text-neutral-500">
         {product.description}
       </p>
+
+      {/* Specifications */}
 
       <div className="mb-4 flex gap-2">
         <span className="rounded bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600">
           {product.ram}
         </span>
+
         <span className="rounded bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600">
           {product.storage}
         </span>
       </div>
+
+      {/* Price and Rent Button */}
 
       <div className="flex items-center justify-between">
         <div>
           <span className="text-lg font-bold text-neutral-900">
             ${product.price.toLocaleString()}
           </span>
+
           <span className="text-sm text-neutral-500"> JMD/day</span>
         </div>
-        <button
+
+        <motion.button
           disabled={isOutOfStock}
+          whileHover={!isOutOfStock ? { scale: 1.06 } : {}}
+          whileTap={!isOutOfStock ? { scale: 0.95 } : {}}
           className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium transition ${
             isOutOfStock
               ? "cursor-not-allowed bg-neutral-200 text-neutral-400"
@@ -173,7 +230,9 @@ function ProductCard({ product }: { product: Product }) {
         >
           Rent
           <svg
-            className={`h-4 w-4 ${isOutOfStock ? "text-neutral-400" : "text-amber-300"}`}
+            className={`h-4 w-4 ${
+              isOutOfStock ? "text-neutral-400" : "text-amber-300"
+            }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -185,56 +244,106 @@ function ProductCard({ product }: { product: Product }) {
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }
+
+// Main Product Page
 
 export default function ProductListPage() {
   const [, setActiveCategory] = useState("Personal");
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen overflow-hidden bg-white">
       <Header activePage="products" />
 
-      {/* Title Section */}
+      {/* TITLE SECTION */}
+
       <section className="px-6 py-12 text-center md:px-12 lg:px-20">
-        <h1 className="mb-3 font-serif text-5xl font-normal tracking-tight text-neutral-900 md:text-6xl">
+        <motion.h1
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="mb-3 font-serif text-5xl font-normal tracking-tight text-neutral-900 md:text-6xl"
+        >
           Product List.
-        </h1>
-        <p className="text-sm text-neutral-400">
+        </motion.h1>
+
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.2 }}
+          className="text-sm text-neutral-400"
+        >
           Choose your device and get started on the journey
-        </p>
+        </motion.p>
       </section>
 
-      {/* Category Filters */}
-      <section className="flex flex-wrap justify-center gap-3 px-6 pb-10">
-        {categories.map((category) => (
-          <button
+      {/* CATEGORY FILTERS */}
+
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        className="flex flex-wrap justify-center gap-3 px-6 pb-10"
+      >
+        {categories.map((category, index) => (
+          <motion.button
             key={category}
+            variants={fadeUp}
+            transition={{ delay: index * 0.1, duration: 0.5 }}
+            whileHover={{ scale: 1.07, y: -3 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setActiveCategory(category)}
             className="rounded-full bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800"
           >
             {category}
-          </button>
+          </motion.button>
         ))}
-      </section>
+      </motion.section>
 
-      {/* Products Grid */}
+      {/* PRODUCTS GRID */}
+
       <section className="px-6 pb-12 md:px-12 lg:px-20">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.05 }}
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {products.map((product, index) => (
+              <motion.div
+                key={product.id}
+                variants={fadeUp}
+                transition={{
+                  duration: 0.7,
+                  delay: (index % 3) * 0.15,
+                }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Pagination */}
-      <section className="flex items-center justify-center gap-3 pb-10">
-        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 text-neutral-400 transition hover:border-neutral-400 hover:text-neutral-600">
+      {/* PAGINATION */}
+
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="flex items-center justify-center gap-3 pb-10"
+      >
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 text-neutral-400 transition hover:border-neutral-400 hover:text-neutral-600"
+        >
           <svg
             className="h-4 w-4"
             fill="none"
@@ -248,11 +357,17 @@ export default function ProductListPage() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-        </button>
+        </motion.button>
+
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-900 text-sm font-medium text-white">
           1
         </span>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 text-neutral-400 transition hover:border-neutral-400 hover:text-neutral-600">
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300 text-neutral-400 transition hover:border-neutral-400 hover:text-neutral-600"
+        >
           <svg
             className="h-4 w-4"
             fill="none"
@@ -266,16 +381,23 @@ export default function ProductListPage() {
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </button>
-      </section>
+        </motion.button>
+      </motion.section>
 
-      {/* Quote Section */}
-      <section className="px-6 pb-16 text-center md:px-12 lg:px-20">
-        <p className="text-sm text-neutral-400 italic">
+      {/* QUOTE SECTION */}
+
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="px-6 pb-16 text-center md:px-12 lg:px-20"
+      >
+        <p className="text-sm italic text-neutral-400">
           Every laptop has a purpose. Make yours a tool for success, knowledge,
-          and a better future
+          and a better future.
         </p>
-      </section>
+      </motion.section>
 
       <Footer />
     </div>
